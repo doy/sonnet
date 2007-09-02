@@ -1,0 +1,8 @@
+: test
+  begin
+    1 + dup notify
+    dup 10 > if ; then
+  repeat ;
+
+: main
+  0 test ;

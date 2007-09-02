@@ -1,0 +1,15 @@
+: fact_rec
+  dup 1 != if
+    dup rot * swap 1 - fact_rec
+  then
+;
+
+: fact ( recursive factorial function )
+  1 swap fact_rec pop
+;
+
+: main
+  1 begin
+    dup ": strcat 15 fact spacecat notify
+  1 + dup 1000 > until
+;
