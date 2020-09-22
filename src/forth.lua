@@ -18,7 +18,7 @@ local function pop()
 end
 
 local function peek( n )
-    return stack[ table.getn( stack ) - n ]
+    return stack[ #stack  - n ]
 end
 
 -- returns true if every element of tab is true
@@ -171,11 +171,11 @@ keywords = {
                        local num = tonumber( pop() )
                        if num > 0 then
                            push( table.remove( stack,
-                                               table.getn( stack ) - num + 1
+                                               #stack  - num + 1
                                              )
                                )
                        elseif num < 0 then
-                           table.insert( stack, table.getn( stack ) + num + 1,
+                           table.insert( stack, #stack  + num + 1,
                                          table.remove( stack )
                                        )
                        end
@@ -320,24 +320,24 @@ keywords = {
                    end
     ,
     ["stack"] =    function()
-                       for i = 0, table.getn( stack ) - 1 do
+                       for i = 0, #stack  - 1 do
                            io.write( peek( i ), "\n" )
                        end
                    end
     ,
     ["depth"] =    function()
-                       push( table.getn( stack ) )
+                       push( #stack  )
                    end
     ,
     ["explode"] =  function()
                        local delim, str, count, ret = pop(), pop(), 0, {}
                        str = str .. delim
-                       for match in string.gfind( str, "(.-)" .. delim ) do
+                       for match in string.gmatch( str, "(.-)" .. delim ) do
                            table.insert( ret, match )
                            count = count + 1
                        end
                        -- push in reverse order so they pop off in order
-                       for i = table.getn( ret ), 1, -1 do
+                       for i = #ret , 1, -1 do
                            push( ret[ i ] )
                        end
                        push( count )
@@ -370,49 +370,49 @@ keywords = {
     ,
     ["until"] =    function()
                        if tonumber( pop() ) == 0 then
-                           return while_stack[ table.getn( while_stack ) ].loc
+                           return while_stack[ #while_stack  ].loc
                        else
                            table.remove( while_stack )
                        end
                    end
     ,
     ["repeat"] =   function()
-                       return while_stack[ table.getn( while_stack ) ].loc
+                       return while_stack[ #while_stack  ].loc
                    end
     ,
     ["continue"] = function() -- different from repeat since break ignores it
-                       return while_stack[ table.getn( while_stack ) ].loc
+                       return while_stack[ #while_stack  ].loc
                    end
     ,
     ["if"] =       function()
                        if pop() == '0' then table.insert( if_stack, false )
                        else table.insert( if_stack, true )
                        end
-                       if table.getn( while_stack ) > 0 then
-                           while_stack[ table.getn( while_stack ) ].ifs = 
-                             while_stack[ table.getn( while_stack ) ].ifs + 1
+                       if #while_stack  > 0 then
+                           while_stack[ #while_stack  ].ifs = 
+                             while_stack[ #while_stack  ].ifs + 1
                        end
 
                        executing = multiand( if_stack )
                    end
     ,
     ["else"] =     function()
-                       if_stack[ table.getn( if_stack ) ] =
-                         not if_stack[ table.getn( if_stack ) ]
+                       if_stack[ #if_stack  ] =
+                         not if_stack[ #if_stack  ]
                        executing = multiand( if_stack )
                    end
     ,
     ["then"] =     function()
                        table.remove( if_stack )
-                       if table.getn( while_stack ) > 0 then
-                           while_stack[ table.getn( while_stack ) ].ifs =
-                             while_stack[ table.getn( while_stack ) ].ifs - 1
+                       if #while_stack  > 0 then
+                           while_stack[ #while_stack  ].ifs =
+                             while_stack[ #while_stack  ].ifs - 1
                        end
                        executing = multiand( if_stack )
                    end
     ,
     ["break"] =    function()
-                      local ifs = while_stack[ table.getn( while_stack ) ].ifs
+                      local ifs = while_stack[ #while_stack  ].ifs
                       while ifs > 0 do
                           table.remove( if_stack )
                           ifs = ifs - 1
@@ -442,7 +442,7 @@ keywords = {
                    end
     ,
     ["put"] =      function()
-                       stack[ table.getn( stack ) - pop() - 1 ] = pop()
+                       stack[ #stack  - pop() - 1 ] = pop()
                    end
     ,
     ["random"] =   function()
@@ -810,7 +810,7 @@ while not done do
 
     -- split the input string (add stuff from args here for quote parsing)
     local comment = false
-    for word in string.gfind( exec_str, "%S+" ) do
+    for word in string.gmatch( exec_str, "%S+" ) do
         if word == "begin"  then whiles = whiles + 1 end
         if word == "repeat" then whiles = whiles - 1 end
         if word == "until"  then whiles = whiles - 1 end
